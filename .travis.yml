@@ -1,12 +1,25 @@
 language: python
+
+sudo: false
+
 python:
-  - 2.7
-before_install:
- - sudo apt-get update -qq
- - sudo apt-get install -qq spatialite-bin libspatialite3 libgeos++-dev libgdal-dev libproj0
- - make geoip
+    - 2.7
+
+env:
+    - TOXENV=py27-django17
+    - TOXENV=py27-django18
+    - TOXENV=py33-django17
+    - TOXENV=py33-django18
+    - TOXENV=py34-django17
+    - TOXENV=py34-django18
+
 install:
-  - "pip install -r requirements.txt --use-mirrors"
-  - "python setup.py develop"
+    - pip install tox coverage
+
+before_script:
+    - psql -c 'CREATE DATABASE oscar_stores;' -U postgres
+    - psql -c 'CREATE EXTENSION postgis;' -U postgres -d oscar_stores
+    - psql -c 'CREATE EXTENSION postgis_topology;' -U postgres -d oscar_stores
+
 script:
-  - coverage run ./runtests.py
+    - tox

@@ -1,14 +1,15 @@
 from django.views import generic
-from django.db.models import get_model
 from django.core.urlresolvers import reverse_lazy
 from django.template.loader import render_to_string
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _, ugettext
-from extra_views import (CreateWithInlinesView, UpdateWithInlinesView,
-                         InlineFormSet)
+from extra_views import (
+    CreateWithInlinesView, UpdateWithInlinesView, InlineFormSet)
+from oscar.core.loading import get_model
 
 from stores.dashboard import forms
 from stores.utils import get_current_ip
+from stores.dashboard.forms import OpeningHoursInline
 
 Store = get_model('stores', 'Store')
 StoreGroup = get_model('stores', 'StoreGroup')
@@ -67,9 +68,7 @@ class OpeningPeriodInline(InlineFormSet):
     form_class = forms.OpeningPeriodForm
 
 
-from stores.dashboard.forms import OpeningHoursInline
 class StoreEditMixin(object):
-    #inlines = [OpeningPeriodInline, StoreAddressInline]
     inlines = [OpeningHoursInline, StoreAddressInline]
 
     def get_form_kwargs(self):
@@ -148,6 +147,7 @@ class StoreGroupListView(generic.ListView):
 
 class StoreGroupCreateView(generic.CreateView):
     model = StoreGroup
+    fields = ['name', 'slug']
     template_name = "stores/dashboard/store_group_update.html"
     success_url = reverse_lazy('stores-dashboard:store-group-list')
 
@@ -164,6 +164,7 @@ class StoreGroupCreateView(generic.CreateView):
 
 class StoreGroupUpdateView(generic.UpdateView):
     model = StoreGroup
+    fields = ['name', 'slug']
     template_name = "stores/dashboard/store_group_update.html"
     success_url = reverse_lazy('stores-dashboard:store-group-list')
 

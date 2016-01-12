@@ -1,12 +1,7 @@
-from django.db.models import get_model
 from django.core.urlresolvers import reverse
+from oscar.test.testcases import WebTestCase
 
-from django_dynamic_fixture import G
-from oscar_testsupport.testcases import WebTestCase
-
-
-Store = get_model('stores', 'Store')
-StoreAddress = get_model('stores', 'StoreAddress')
+from tests.factories import StoreFactory, StoreAddressFactory
 
 
 class TestDashboardStoreSearchForm(WebTestCase):
@@ -17,15 +12,16 @@ class TestDashboardStoreSearchForm(WebTestCase):
         super(TestDashboardStoreSearchForm, self).setUp()
 
         location = '{"type": "Point", "coordinates": [144.917908,-37.815751]}'
+        location = 'POINT(144.917908 -37.815751)'
 
-        self.store1 = G(Store, name='store1', location=location)
-        self.store2 = G(Store, name='store2', location=location)
+        self.store1 = StoreFactory(name='store1', location=location)
+        self.store2 = StoreFactory(name='store2', location=location)
 
-        G(StoreAddress, store=self.store1,
-                        line1='Great Portland st., London')
-        G(StoreAddress, store=self.store2,
-                        line1='Sturt Street, Melbourne')
-        
+        StoreAddressFactory(
+            store=self.store1, line1='Great Portland st., London')
+        StoreAddressFactory(
+            store=self.store2, line1='Sturt Street, Melbourne')
+
     def test_list_with_search(self):
         resp = self.get(reverse('stores-dashboard:store-list') + '?address=portland+london')
         self.assertIn('form', resp.context)

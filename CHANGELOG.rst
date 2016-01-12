@@ -2,6 +2,29 @@
 Changelog
 =========
 
+0.8
+===
+
+* Django 1.7 support
+* Fix localisation bug
+
+0.7
+===
+
+* Load geocode service dynamically
+* Drop support for Oscar 0.5
+
+0.6.1
+=====
+
+* Support Oscar 0.7
+
+0.6
+===
+
+* Support Django 1.6
+* Templates now load assets over HTTPS where appropriate
+
 0.5.1
 =====
 

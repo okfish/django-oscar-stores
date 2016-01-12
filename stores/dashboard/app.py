@@ -71,4 +71,5 @@ class StoresDashboardApplication(Application):
         return self.post_process_urls(urlpatterns)
 
 
+
 application = StoresDashboardApplication()

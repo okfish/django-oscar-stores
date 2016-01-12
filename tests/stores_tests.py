@@ -1,29 +1,29 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-
 from django_webtest import WebTest
-from django_dynamic_fixture import get as G
-
-from oscar.apps.address.models import Country
+from oscar.test.factories import CountryFactory
 
 from stores.models import Store
+
+from tests.factories import StoreFactory
 
 
 class TestStore(TestCase):
 
     def test_querying_available_pickup_stores(self):
         sample_location = '{"type": "Point", "coordinates": [88.39,11.02]}'
-        store1 = G(Store, is_pickup_store=True, location=sample_location)
-        store2 = G(Store, is_pickup_store=True, location=sample_location)
-        G(Store, is_pickup_store=False, location=sample_location)
-        store4 = G(Store, is_pickup_store=True, location=sample_location)
+        store1 = StoreFactory(is_pickup_store=True, location=sample_location)
+        store2 = StoreFactory(is_pickup_store=True, location=sample_location)
+        StoreFactory(is_pickup_store=False, location=sample_location)
+        store4 = StoreFactory(is_pickup_store=True, location=sample_location)
 
-        stores = Store.objects.pickup_stores()
-        self.assertItemsEqual(
-            list(stores),
-            [store1, store2, store4]
-        )
+        stores = list(Store.objects.pickup_stores())
+
+        self.assertEqual(len(stores), 3)
+        self.assertIn(store1, stores)
+        self.assertIn(store2, stores)
+        self.assertIn(store4, stores)
 
 
 def repr_opening_hours(store):
@@ -70,8 +70,7 @@ class TestASignedInUser(StoresWebTest):
 
     def setUp(self):
         super(TestASignedInUser, self).setUp()
-        self.country = G(
-            Country,
+        self.country = CountryFactory(
             name="AUSTRALIA",
             printable_name="Australia",
             iso_3166_1_a2='AU',
@@ -102,7 +101,7 @@ class TestASignedInUser(StoresWebTest):
 
         self.assertEquals(Store.objects.count(), 1)
 
-        store = Store.objects.get(id=1)
+        store = Store.objects.all()[0]
         self.assertEquals(store.name, 'Sample Store')
         self.assertEquals(store.location.x, 30.203332)
         self.assertEquals(store.location.y, 44.33333)
@@ -151,6 +150,7 @@ class TestASignedInUser(StoresWebTest):
             assert False, repr(resp.context['form'].errors)
 
         store = Store.objects.get(name='WorkingHoursTest')
+        assert store.opening_periods.count() == 3
 
         self.assertEquals(repr_opening_hours(store), {
             1: '10:00 - 11:00, 12:00 - 13:00',

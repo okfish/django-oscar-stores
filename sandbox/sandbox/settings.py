@@ -14,8 +14,10 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-# Default to using Spatialite.  Use a settings_local.py file to use a different
-# database for testing (eg PostGIS)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Default to using PostGIS.  Use a settings_local.py file to use a different
+# database for testing (eg Spatialite)
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -114,7 +116,6 @@ WSGI_APPLICATION = 'sandbox.wsgi.application'
 from oscar import OSCAR_MAIN_TEMPLATE_DIR
 TEMPLATE_DIRS = (
     location('templates'),
-    os.path.join(OSCAR_MAIN_TEMPLATE_DIR, 'templates'),
     OSCAR_MAIN_TEMPLATE_DIR,
 )
 
@@ -127,11 +128,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.gis',
+    'django.contrib.flatpages',
     'django_extensions',
     'debug_toolbar',
-    'south',
     'stores',
     'compressor',
+    'widget_tweaks',
 ]
 
 from oscar import get_core_apps
@@ -144,9 +146,6 @@ AUTHENTICATION_BACKENDS = (
 
 LOGIN_REDIRECT_URL = '/accounts/'
 APPEND_SLASH = True
-
-INTERNAL_IPS = ['127.0.0.1']
-DEBUG_TOOLBAR_CONFIG = {'INTERCEPT_REDIRECTS': False}
 
 # Oscar settings
 from oscar.defaults import *
